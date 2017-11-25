@@ -13,6 +13,19 @@ A simple use for this application might be for a conference or event to allow us
 
 From the project root, run `npm run build` to build the Angular app and launch the Express server.  The app will then be running at `http://localhost:3000`.
 
+## Screenshots
+
+Launching the camera:
+
+![Launch Camera](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_225720.png)
+
+Camera interface:
+![Camera](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_230207.png)
+
+Sharing Via Twitter:
+![Tweeting](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_230228.png)
+
+
 ## Server Config
 
 Create a copy of server/config/config.template.js in the same directory and populate it with your Twitter API info.  Add that file to .gitignore to keep it out of source control.
