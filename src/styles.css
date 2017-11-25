@@ -1,0 +1,23 @@
+.controls{
+  left: 50%;
+  position: absolute;
+  top: 92%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+@media screen and (max-width: 600px) and (min-width: 500px) {
+  .controls{
+    top: 88%;
+  }
+}
+@media screen and (max-width: 499px) {
+  .controls{
+    top: 86%;
+  }
+}
+#main-container{
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
