@@ -20,9 +20,11 @@ Launching the camera:
 ![Launch Camera](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_225720.png)
 
 Camera interface:
+
 ![Camera](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_230207.png)
 
 Sharing Via Twitter:
+
 ![Tweeting](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_230228.png)
 
 
