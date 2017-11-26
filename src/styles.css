@@ -3,7 +3,7 @@
   position: absolute;
   top: 92%;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: 5;
 }
 @media screen and (max-width: 600px) and (min-width: 500px) {
   .controls{
@@ -20,4 +20,17 @@
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
+  z-index: 1;
+}
+#countdown-container{
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+#countdown-container h1 {
+  font-size: 10rem;
+  color: white;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }

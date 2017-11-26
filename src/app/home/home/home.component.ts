@@ -31,15 +31,19 @@ export class HomeComponent implements OnInit {
   @ViewChild(NgForm)
   tweetForm: any;
 
+  countdown: number;
   controlsStyle: any;
   imageSrc: any;
   _navigator = <any> navigator;
   localStream: any;
   isStreaming = false;
-  status: string;
+  status = '';
   successMessage: string;
+  tweetFailedMessage: string;
   errorMessage: string;
   sending = false;
+  footerDisabled = false;
+
 
   constructor( private changeDetectorRef: ChangeDetectorRef, private titleService: Title ) {
     titleService.setTitle('Selfie Station!')
@@ -51,14 +55,21 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    this._navigator = <any>navigator;
+    this._navigator.getUserMedia = ( this._navigator.getUserMedia || this._navigator.webkitGetUserMedia
+      || this._navigator.mozGetUserMedia || this._navigator.msGetUserMedia );
+    if( this._navigator.getUserMedia ) {
+      try{
+        this.startFeed();
+      }
+      catch(e){
+        // fail silently, they'll have to click the button to start the feed
+      }
+    }
   }
 
   startFeed() {
     const video = this.cameraFeedEl.nativeElement;
-    this._navigator = <any>navigator;
-
-    this._navigator.getUserMedia = ( this._navigator.getUserMedia || this._navigator.webkitGetUserMedia
-      || this._navigator.mozGetUserMedia || this._navigator.msGetUserMedia );
 
     this._navigator.mediaDevices.getUserMedia({video: true})
       .then((stream) => {
@@ -84,13 +95,34 @@ export class HomeComponent implements OnInit {
     const width = video.videoWidth;
     const height = video.videoHeight;
 
-    if (width && height) {
-      canvas.width = width;
-      canvas.height = height;
-      context.drawImage(video, 0, 0, width, height);
-      this.imageSrc = canvas.toDataURL('image/png');
+    const self = this;
+    let c = 3;
+    let interval;
+
+    const snapIt = function(){
+      if (width && height) {
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(video, 0, 0, width, height);
+        self.imageSrc = canvas.toDataURL('image/png');
+      }
+      self.shutterEl.nativeElement.play();
     }
-    this.shutterEl.nativeElement.play();
+
+    const counter = function(){
+      c = c-1;
+      self.countdown = c;
+      if( c === 0 ) {
+        clearInterval(interval);
+        snapIt();
+        self.countdown = null;
+        self.share();
+      }
+    }
+
+    self.countdown = c;
+    interval = setInterval(counter, 1000);
+
     return false;
   }
 
@@ -101,6 +133,7 @@ export class HomeComponent implements OnInit {
 
   share() {
     $('#shareModal').modal('show');
+    this.tweetFailedMessage = '';
     const self = this;
     $('#shareModal').one('shown.bs.modal', function(){
       //$('#tweet').focus();
@@ -118,28 +151,33 @@ export class HomeComponent implements OnInit {
   }
 
   tweetSubmit() {
-    const formGroup = this.tweetForm.form;
-    Util.validateAllFormFields(formGroup);
-    if(formGroup.valid) {
-      const f = Util.dataURLtoFile(this.imageSrc, 'snapshot.png');
-      const form = new FormData();
-      form.append('tweet', this.status);
-      form.append('uploadFile', f);
+    const f = Util.dataURLtoFile(this.imageSrc, 'snapshot.png');
+    const form = new FormData();
+    form.append('tweet', this.status);
+    form.append('uploadFile', f);
 
-      this.sending = true;
+    this.sending = true;
 
-      fetch(environment.serviceUrl, {
-        method: 'post',
-        body: form
-      })
-        .then((response) =>{
+    fetch(environment.serviceUrl, {
+      method: 'post',
+      body: form
+    })
+      .then((response) =>{
+        const self = this;
+        self.successMessage = 'Posted to Twitter!';
+        self.sending = false;
+        self.footerDisabled = true;
+        setTimeout(()=>{
           $('#shareModal').modal('hide');
-          const self = this;
-          self.successMessage = 'Sent!';
-          self.sending = false;
-          setTimeout(()=>{self.successMessage = '';}, 2500);
-        });
-    }
+          self.successMessage = '';
+          self.footerDisabled = false;
+        }, 2500);
+      })
+      .catch((e) =>{
+        this.tweetFailedMessage = 'Failed to Post to Twitter.  Is the service running?'
+        this.sending = false;
+        this.footerDisabled = false;
+      });
   }
 
 }

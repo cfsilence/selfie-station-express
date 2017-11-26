@@ -9,9 +9,12 @@
     </div>
   </div>
 
+  <div id="countdown-container" *ngIf="countdown">
+    <h1>{{countdown}}</h1>
+  </div>
+
   <div [ngClass]="isStreaming ? 'd-flex' : 'd-none'">
     <div class="ml-auto mr-auto" id="video-container" #videoContainer>
-      <div class="alert alert-success pb-3" *ngIf="successMessage">{{successMessage}}</div>
       <img #snapShot [attr.src]="imageSrc" [ngClass]="imageSrc ? 'd-flex' : 'd-none'" class="img-thumbnail" />
       <video #cameraFeed id="cameraFeed" [ngClass]="imageSrc ? 'd-none' : 'd-flex'" class="img-thumbnail"></video>
       <canvas class="d-none" #canvas></canvas>
@@ -20,15 +23,19 @@
 
   <div class="controls ml-auto mr-auto p-3" *ngIf="isStreaming" #controls [style.width]="controlsStyle?.width">
     <div class="d-flex w-100 align-items-center">
+      <!--
       <div class="mr-auto">
         <button class="btn btn-dark text-white rounded-circle" [disabled]="!imageSrc" (click)="discardSnapshot()"><i class="fa fa-trash-o"></i></button>
       </div>
+      -->
       <div class="mr-auto ml-auto">
         <a href="#" class="btn btn-lg btn-dark text-white rounded-circle" (click)="takeSnapshot()"><i class="fa fa-camera"></i></a>
       </div>
+      <!--
       <div class="ml-auto">
         <button class="btn btn-dark text-white rounded-circle" [disabled]="!imageSrc" (click)="share()"><i class="fa fa-twitter"></i></button>
       </div>
+      -->
     </div>
   </div>
 
@@ -37,25 +44,18 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Share It!</h4>
+        <h4 class="modal-title">Publish To Twitter?</h4>
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
       </div>
-      <form #tweetForm="ngForm" id="tweetForm" novalidate="novalidate" (ngSubmit)="tweetSubmit()" [className]="tweetForm.touched && tweetForm.invalid ? 'was-validated' : ''">
-        <div class="modal-body">
-          <div class="form-group">
-            <textarea name="tweet" id="tweet" cols="30" rows="4" maxlength="280" required #tweet="ngModel" class="form-control" [(ngModel)]="status" placeholder="Twitter Status..."></textarea>
-            <small id="tweetHelp" class="form-text text-right" [ngClass]="status?.length > 260 ? (status?.length == 280 ? 'text-danger' : 'text-warning') : 'text-muted'">{{status?.length || 0}} / 280</small>
-            <span class="invalid-feedback" *ngIf="tweet.invalid && (tweet.dirty || tweet.touched) && tweet.errors.required">
-              What, no tweet??
-            </span>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-light" type="button" id="cancelBtn" data-dismiss="modal" *ngIf="!sending">Cancel</button>
-          <button class="btn btn-primary" id="tweetBtn" [disabled]="sending || (tweetForm.invalid)"><span *ngIf="!sending"><i class="fa fa-twitter-square"></i> Tweet It!</span><span *ngIf="sending" class="fa fa-spinner fa-spin"></span></button>
-        </div>
-      </form>
+      <div class="modal-body">
+        <div class="alert alert-success pb-3 text-center" *ngIf="successMessage"><strong>{{successMessage}}</strong></div>
+        <div class="alert alert-danger pb-3 text-center" *ngIf="tweetFailedMessage"><strong>{{tweetFailedMessage}}</strong></div>
+        <img #snapShot [attr.src]="imageSrc" [ngClass]="imageSrc ? 'd-flex' : 'd-none'" class="img-thumbnail" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" [disabled]="footerDisabled"  type="button" id="cancelBtn" data-dismiss="modal" *ngIf="!sending"><i class="fa fa-trash-o"></i> Discard</button>
+        <button class="btn btn-primary" id="tweetBtn" (click)="tweetSubmit()" [disabled]="sending || footerDisabled"><span *ngIf="!sending"><i class="fa fa-twitter-square"></i> Publish</span><span *ngIf="sending" class="fa fa-spinner fa-spin"></span></button>
+      </div>
     </div>
   </div>
 </div>
