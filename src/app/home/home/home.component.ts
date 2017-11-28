@@ -72,7 +72,12 @@ export class HomeComponent implements OnInit {
     this._navigator.mediaDevices.getUserMedia({video: true})
       .then((stream) => {
         this.localStream = stream;
-        video.src = window.URL.createObjectURL(stream);
+        if ("srcObject" in video) {
+          video.srcObject = stream;
+        } else {
+          // Avoid using this in new browsers, as it is going away.
+          video.src = window.URL.createObjectURL(stream);
+        }
         video.play();
       })
       .catch((error) =>{
