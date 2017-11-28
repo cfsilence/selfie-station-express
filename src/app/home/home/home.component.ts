@@ -31,19 +31,17 @@ export class HomeComponent implements OnInit {
   @ViewChild(NgForm)
   tweetForm: any;
 
-  countdown: number;
+  countdownMessage: string;
+  successMessage: string;
+  overlayMessage: string;
+  overlayError: string;
   controlsStyle: any;
   imageSrc: any;
   _navigator = <any> navigator;
   localStream: any;
   isStreaming = false;
   status = '';
-  successMessage: string;
-  tweetFailedMessage: string;
   errorMessage: string;
-  sending = false;
-  footerDisabled = false;
-
 
   constructor( private changeDetectorRef: ChangeDetectorRef, private titleService: Title ) {
     titleService.setTitle('Selfie Station!')
@@ -92,9 +90,10 @@ export class HomeComponent implements OnInit {
     const video = this.cameraFeedEl.nativeElement;
     const canvas = this.canvasEl.nativeElement;
     const context = canvas.getContext('2d');
-    const width = video.videoWidth;
-    const height = video.videoHeight;
-
+    // maintain the aspect ratio
+    const ratio = video.videoWidth / video.videoHeight;
+    const width = this.videoContainerEl.nativeElement.offsetHeight * ratio;
+    const height = this.videoContainerEl.nativeElement.offsetHeight;
     const self = this;
     let c = 3;
     let interval;
@@ -111,43 +110,35 @@ export class HomeComponent implements OnInit {
 
     const counter = function(){
       c = c-1;
-      self.countdown = c;
+      self.countdownMessage = c.toString();
       if( c === 0 ) {
         clearInterval(interval);
         snapIt();
-        self.countdown = null;
-        self.share();
+        self.countdownMessage = null;
       }
     }
 
-    self.countdown = c;
+    self.countdownMessage = c.toString();
     interval = setInterval(counter, 1000);
 
     return false;
   }
 
   discardSnapshot() {
+    this.countdownMessage = null;
+    this.overlayMessage = null;
+    this.successMessage = null;
+    this.overlayError = null;
     this.imageSrc = null;
     return false;
   }
 
-  share() {
-    $('#shareModal').modal('show');
-    this.tweetFailedMessage = '';
-    const self = this;
-    $('#shareModal').one('shown.bs.modal', function(){
-      //$('#tweet').focus();
-    });
-    $('#shareModal').one('hidden.bs.modal', function(){
-      self.discardSnapshot();
-    });
-
-    return false;
-  }
-
   onResize(event) {
-    const videoContainer = this.videoContainerEl.nativeElement;
-    this.controlsStyle = {width: videoContainer.offsetWidth + 'px'};
+    const video = this.cameraFeedEl.nativeElement;
+    // maintain the aspect ratio
+    const ratio = video.videoWidth / video.videoHeight;
+    const width = this.videoContainerEl.nativeElement.offsetHeight * ratio;
+    this.controlsStyle = {width: width + 'px'};
   }
 
   tweetSubmit() {
@@ -155,8 +146,7 @@ export class HomeComponent implements OnInit {
     const form = new FormData();
     form.append('tweet', this.status);
     form.append('uploadFile', f);
-
-    this.sending = true;
+    this.overlayMessage = '<i class="fa fa-refresh fa-spin"></i> Posting...'
 
     fetch(environment.serviceUrl, {
       method: 'post',
@@ -164,19 +154,21 @@ export class HomeComponent implements OnInit {
     })
       .then((response) =>{
         const self = this;
+        self.overlayMessage = null;
         self.successMessage = 'Posted to Twitter!';
-        self.sending = false;
-        self.footerDisabled = true;
         setTimeout(()=>{
-          $('#shareModal').modal('hide');
-          self.successMessage = '';
-          self.footerDisabled = false;
+          self.discardSnapshot()
         }, 2500);
       })
       .catch((e) =>{
-        this.tweetFailedMessage = 'Failed to Post to Twitter.  Is the service running?'
-        this.sending = false;
-        this.footerDisabled = false;
+        const self = this;
+        this.countdownMessage = null;
+        this.overlayMessage = null;
+        this.successMessage = null;
+        self.overlayError = 'Failed to Post to Twitter.  Is the service running?'
+        setTimeout(()=>{
+          self.discardSnapshot()
+        }, 2500);
       });
   }
 

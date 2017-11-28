@@ -2,7 +2,10 @@
 const express = require('express');
 const path = require('path');
 const http = require('http');
+const https = require('https');
+const fs = require('fs');
 const bodyParser = require('body-parser');
+const config = require('./server/config/config.js');
 
 // Get our API routes
 const api = require('./server/routes/api');
@@ -31,9 +34,23 @@ const port = process.env.PORT || '3000';
 app.set('port', port);
 
 /**
+ * SSL config
+ */
+const options = {
+  key: fs.readFileSync(config.ssl.keyPath),
+  cert: fs.readFileSync(config.ssl.certPath)
+};
+
+/**
  * Create HTTP server.
  */
-const server = http.createServer(app);
+let server;
+if( config.ssl.useSSL ) {
+  server = https.createServer(options, app);
+}
+else {
+  server = http.createServer(app);
+}
 
 /**
  * Listen on provided port, on all network interfaces.

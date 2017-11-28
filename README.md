@@ -36,6 +36,19 @@ Create a copy of server/config/config.template.js in the same directory and popu
 
 Update the environment.* files as necessary to point the service at the proper endpoint.
 
+## SSL
+
+If you'd like to use SSL, edit the `config` as necessary:
+
+```
+config.ssl = {};
+config.ssl.useSSL = false;
+config.ssl.keyPath = '';
+config.ssl.certPath = '';
+```
+
+*If you choose to use SSL make sure that the Angular service URL reflects https!*
+
 ## Note
 
 This is my first Node/Express app.  It's a simple one, but feedback is welcomed.  

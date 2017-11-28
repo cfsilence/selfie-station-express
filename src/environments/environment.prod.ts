@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  serviceUrl: "http://localhost:9000/tweet",
+  serviceUrl: "https://localhost:3000/api/tweet",
 };
