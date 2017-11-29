@@ -15,17 +15,17 @@ From the project root, run `npm run build` to build the Angular app and launch t
 
 ## Screenshots
 
-Launching the camera:
+Launching the camera (only shown if browser blocks auto launch):
 
 ![Launch Camera](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_225720.png)
 
 Camera interface:
 
-![Camera](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_230207.png)
+![Camera](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171128_230803.png)
 
 Sharing Via Twitter:
 
-![Tweeting](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171124_230228.png)
+![Tweeting](https://s3.amazonaws.com/img.recursive.codes/Screenshot_20171128_230824.png)
 
 
 ## Server Config
@@ -38,7 +38,7 @@ Update the environment.* files as necessary to point the service at the proper e
 
 ## SSL
 
-If you'd like to use SSL, edit the `config` as necessary:
+If you'd like to use SSL (*Recommended - some browsers block getUserMedia() in insecure contexts*), edit the `config` as necessary:
 
 ```
 config.ssl = {};
@@ -47,7 +47,7 @@ config.ssl.keyPath = '';
 config.ssl.certPath = '';
 ```
 
-*If you choose to use SSL make sure that the Angular service URL reflects https!*
+*If you choose to use SSL make sure that the Angular service URL (in `environment.ts`) reflects https!*
 
 ## Note
 
