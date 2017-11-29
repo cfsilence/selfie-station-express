@@ -1,8 +1,10 @@
 const express = require('express');
+const fs = require('fs');
 const router = express.Router();
 const Twitter = require('twitter');
-const multer  = require('multer')
-const upload = multer({ storage: multer.memoryStorage()})
+const multer  = require('multer');
+var storage = multer.memoryStorage();
+const upload = multer({ storage: storage, limits: {fieldSize: 5*1024*1024} });
 
 const config = require('../config/config.js');
 

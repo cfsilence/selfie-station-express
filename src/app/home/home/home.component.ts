@@ -147,34 +147,39 @@ export class HomeComponent implements OnInit {
   }
 
   tweetSubmit() {
-    const f = Util.dataURLtoFile(this.imageSrc, 'snapshot.png');
-    const form = new FormData();
-    form.append('tweet', this.status);
-    form.append('uploadFile', f);
     this.overlayMessage = '<i class="fa fa-refresh fa-spin"></i> Posting...'
 
-    fetch(environment.serviceUrl, {
-      method: 'post',
-      body: form
-    })
-      .then((response) =>{
-        const self = this;
-        self.overlayMessage = null;
-        self.successMessage = 'Posted to Twitter!';
-        setTimeout(()=>{
-          self.discardSnapshot()
-        }, 2500);
-      })
-      .catch((e) =>{
-        const self = this;
-        this.countdownMessage = null;
-        this.overlayMessage = null;
-        this.successMessage = null;
-        self.overlayError = 'Failed to Post to Twitter.  Is the service running?'
-        setTimeout(()=>{
-          self.discardSnapshot()
-        }, 2500);
-      });
+    const canvas = this.canvasEl.nativeElement;
+    const self = this;
+    canvas.toBlob(
+      function (blob) {
+        const form = new FormData();
+        form.append('tweet', self.status);
+        form.append('uploadFile', blob, 'snapshot.png');
+
+        fetch(environment.serviceUrl, {
+          method: 'post',
+          body: form
+        })
+          .then((response) =>{
+            self.overlayMessage = null;
+            self.successMessage = 'Posted to Twitter!';
+            setTimeout(()=>{
+              self.discardSnapshot()
+            }, 2500);
+          })
+          .catch((e) =>{
+            this.countdownMessage = null;
+            this.overlayMessage = null;
+            this.successMessage = null;
+            self.overlayError = 'Failed to Post to Twitter.  Is the service running?'
+            setTimeout(()=>{
+              self.discardSnapshot()
+            }, 2500);
+          });
+      },
+      'image/png'
+    );
   }
 
 }

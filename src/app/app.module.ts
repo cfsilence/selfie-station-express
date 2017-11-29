@@ -28,7 +28,7 @@ const appRoutes: Routes = [
       appRoutes,
       {enableTracing: true}
     ),
-    AngularFontAwesomeModule
+    AngularFontAwesomeModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
